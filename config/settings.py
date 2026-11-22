@@ -211,3 +211,15 @@ LOGGING = {
     },
 }
 
+TELEGRAM_BOT_TOKEN = os.getenv("TG_TOKEN")
+
+TELEGRAM_BOT_TOKEN = os.getenv("TG_TOKEN")
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "check-habits-every-5-minutes": {
+        "task": "habit.tasks.send_habit_reminders",
+        "schedule": 300.0,  # секунды
+    },
+}

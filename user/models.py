@@ -38,12 +38,13 @@ class UserProfile(models.Model):
         related_name="profile",
         verbose_name="Пользователь",
     )
-
     city = models.CharField("Город", max_length=100, blank=True)
-
-    class Meta:
-        verbose_name = "Профиль"
-        verbose_name_plural = "Профили"
+    tg_chat_id = models.CharField(
+        "Telegram chat_id",
+        max_length=64,
+        blank=True,
+        default="",
+    )
 
     def __str__(self):
         return f"Profile of {self.user.username}"
