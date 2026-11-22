@@ -1,16 +1,21 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
 from django.db import models
 from django.conf import settings
 
 
-class UserManager(models.Manager):
-    def create_user(self, username, email, password=None):
+class UserManager(DjangoUserManager):
+    """Менеджер пользователя с обязательным email."""
+
+    def create_user(self, username, email=None, password=None, **extra_fields):
         if not email:
             raise ValueError("Email must be provided")
-        user = self.model(username=username, email=email)
-        user.set_password(password)
-        user.save()
-        return user
+        return super().create_user(
+            username=username,
+            email=email,
+            password=password,
+            **extra_fields,
+        )
+
 
 
 class User(AbstractUser):
