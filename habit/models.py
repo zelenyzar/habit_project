@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.conf import settings
+
 
 User = get_user_model()
 
@@ -9,10 +11,9 @@ class Habit(models.Model):
     """Модель «Привычка»."""
 
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="habits",
-        verbose_name="Создатель",
+        related_name='habits'
     )
 
     place = models.CharField(
@@ -68,13 +69,11 @@ class Habit(models.Model):
     created_at = models.DateTimeField(
         "Дата создания",
         auto_now_add=True,
-        read_only=True,
     )
 
     updated_at = models.DateTimeField(
         "Дата обновления",
         auto_now=True,
-        read_only=True,
     )
 
     class Meta:
@@ -85,7 +84,8 @@ class Habit(models.Model):
     def __str__(self):
         return f"{self.user.username}: «{self.action[:40]}…»"
 
-    def _strip_reward(self, value):
+    @staticmethod
+    def _strip_reward(value):
         return value.strip() if isinstance(value, str) else ""
 
     def clean(self):

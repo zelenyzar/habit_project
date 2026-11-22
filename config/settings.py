@@ -29,8 +29,8 @@ INSTALLED_APPS = [
     "django_filters",
     "drf_yasg",
     "django_celery_beat",
-    "users",
-    "materials",
+    "user",
+    "habit",
 ]
 
 MIDDLEWARE = [
@@ -105,7 +105,6 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
-USE_L18N = True
 
 USE_TZ = True
 
@@ -130,7 +129,7 @@ MEDIA_URL = "/media/"
 # место, где будут храниться файлы
 MEDIA_ROOT = BASE_DIR / "media"
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "user.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
@@ -211,3 +210,4 @@ LOGGING = {
         },
     },
 }
+

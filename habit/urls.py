@@ -1,12 +1,11 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from . import views
-
+from habit import views
 
 router = DefaultRouter()
-router.register(r'habits', views.HabitViewSet)
+router.register(r'habits', views.HabitViewSet, basename='habit')
 
 urlpatterns = [
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 ]

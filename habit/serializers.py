@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Habit
+from habit.models import Habit
 
 
 class HabitNestedSerializer(serializers.ModelSerializer):
@@ -10,23 +10,21 @@ class HabitNestedSerializer(serializers.ModelSerializer):
 
 class HabitSerializer(serializers.ModelSerializer):
     related_habit = HabitNestedSerializer(read_only=True)
+    related_habit_id = serializers.PrimaryKeyRelatedField(
+        queryset=Habit.objects.filter(is_pleasant=True),
+        source="related_habit",
+        write_only=True,
+        required=False,
+        allow_null=True,  # null = отвязать привычку при PATCH
+    )
 
     class Meta:
         model = Habit
         fields = [
-            "id",
-            "user",
-            "action",
-            "place",
-            "time",
-            "is_pleasant",
-            "related_habit",
-            "periodicity",
-            "reward",
-            "duration_minutes",
-            "is_public",
-            "created_at",
-            "updated_at",
+            "id", "user", "action", "place", "time",
+            "is_pleasant", "related_habit", "related_habit_id",
+            "periodicity", "reward", "duration_minutes",
+            "is_public", "created_at", "updated_at",
         ]
         read_only_fields = ["user", "created_at", "updated_at"]
 
@@ -40,16 +38,30 @@ class HabitSerializer(serializers.ModelSerializer):
         return value.strip() if isinstance(value, str) else ""
 
     def validate(self, attrs):
-        # Текущее значение (для PATCH), если поле не передано
+        instance = self.instance
+
         is_pleasant = attrs.get(
             "is_pleasant",
-            getattr(self.instance, "is_pleasant", False) if self.instance else False,
+            instance.is_pleasant if instance else False,
         )
-        related = attrs.get("related_habit")
-        reward = attrs.get("reward", "") or ""
+        related = attrs.get(
+            "related_habit",
+            instance.related_habit if instance else None,
+        )
+        # ВАЖНО: если поле не передано, берём текущее значение из instance
+        reward = attrs.get(
+            "reward",
+            instance.reward if instance else "",
+        ) or ""
         reward_str = self._strip_reward(reward)
-        duration = attrs.get("duration_minutes", 0)
-        periodicity = attrs.get("periodicity", 1)
+        duration = attrs.get(
+            "duration_minutes",
+            instance.duration_minutes if instance else 0,
+        )
+        periodicity = attrs.get(
+            "periodicity",
+            instance.periodicity if instance else 1,
+        )
 
         # 4. Приятная: нет reward, нет related_habit
         if is_pleasant:
