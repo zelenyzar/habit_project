@@ -1,8 +1,7 @@
 import requests
-
 from django.conf import settings
-from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
 
 User = get_user_model()
 
@@ -49,7 +48,6 @@ class Command(BaseCommand):
                     )
                     continue
 
-                # ищем пользователя по email
                 user = User.objects.filter(email=text).first()
                 if user is None:
                     requests.post(
@@ -63,8 +61,14 @@ class Command(BaseCommand):
                     )
                     continue
 
-                profile, _ = user.profile if hasattr(user, "profile") else (
-                    __import__("user.models", fromlist=["UserProfile"]).UserProfile.objects.get_or_create(user=user)
+                profile, _ = (
+                    user.profile
+                    if hasattr(user, "profile")
+                    else (
+                        __import__(
+                            "user.models", fromlist=["UserProfile"]
+                        ).UserProfile.objects.get_or_create(user=user)
+                    )
                 )
                 profile.tg_chat_id = str(chat_id)
                 profile.save()

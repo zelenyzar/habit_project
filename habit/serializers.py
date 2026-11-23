@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from habit.models import Habit
 
 
@@ -15,21 +16,30 @@ class HabitSerializer(serializers.ModelSerializer):
         source="related_habit",
         write_only=True,
         required=False,
-        allow_null=True,  # null = отвязать привычку при PATCH
+        allow_null=True,
     )
 
     class Meta:
         model = Habit
         fields = [
-            "id", "user", "action", "place", "time",
-            "is_pleasant", "related_habit", "related_habit_id",
-            "periodicity", "reward", "duration_minutes",
-            "is_public", "created_at", "updated_at",
+            "id",
+            "user",
+            "action",
+            "place",
+            "time",
+            "is_pleasant",
+            "related_habit",
+            "related_habit_id",
+            "periodicity",
+            "reward",
+            "duration_minutes",
+            "is_public",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ["user", "created_at", "updated_at"]
 
     def create(self, validated_data):
-        # Берём пользователя из контекста (из request), а не из JSON
         validated_data["user"] = self.context["request"].user
         return super().create(validated_data)
 
@@ -38,9 +48,17 @@ class HabitSerializer(serializers.ModelSerializer):
         return value.strip() if isinstance(value, str) else ""
 
     def validate(self, attrs):
-        reward = attrs.get("reward", getattr(self.instance, "reward", None) if self.instance else None)
-        related = attrs.get("related_habit", getattr(self.instance, "related_habit", None) if self.instance else None)
-        is_pleasant = attrs.get("is_pleasant", getattr(self.instance, "is_pleasant", False) if self.instance else False)
+        reward = attrs.get(
+            "reward", getattr(self.instance, "reward", None) if self.instance else None
+        )
+        related = attrs.get(
+            "related_habit",
+            getattr(self.instance, "related_habit", None) if self.instance else None,
+        )
+        is_pleasant = attrs.get(
+            "is_pleasant",
+            getattr(self.instance, "is_pleasant", False) if self.instance else False,
+        )
 
         if reward and related:
             raise serializers.ValidationError(
@@ -58,6 +76,7 @@ class HabitSerializer(serializers.ModelSerializer):
             )
 
         return attrs
+
     def validate_periodicity(self, value):
         if value < 1 or value > 7:
             raise serializers.ValidationError(

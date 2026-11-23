@@ -1,5 +1,4 @@
 import requests
-
 from celery import shared_task
 from django.conf import settings
 from django.utils import timezone
@@ -18,7 +17,7 @@ def send_habit_reminder(habit_id):
 
     chat_id = getattr(habit.user.profile, "tg_chat_id", "")
     if not chat_id:
-        return  # пользователь не привязал Telegram
+        return
 
     message = (
         f"⏰ Пора выполнить привычку!\n"
@@ -34,7 +33,6 @@ def send_habit_reminder(habit_id):
         )
         response.raise_for_status()
     except requests.RequestException as e:
-        # не даём падать воркеру из-за сети — логируем
         print(f"Ошибка отправки в Telegram (habit {habit_id}): {e}")
 
 
@@ -50,7 +48,6 @@ def check_habits():
     for habit in Habit.objects.select_related("user__profile"):
         if habit.time.replace(second=0, microsecond=0) != current_time:
             continue
-        # периодичность: считаем, сколько дней прошло с создания привычки
         days_since = (now.date() - habit.created_at.date()).days
         if days_since % habit.periodicity == 0:
             send_habit_reminder.delay(habit.id)

@@ -1,6 +1,7 @@
-from django.contrib.auth.models import AbstractUser, UserManager as DjangoUserManager
-from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import UserManager as DjangoUserManager
+from django.db import models
 
 
 class UserManager(DjangoUserManager):
@@ -15,7 +16,6 @@ class UserManager(DjangoUserManager):
             password=password,
             **extra_fields,
         )
-
 
 
 class User(AbstractUser):

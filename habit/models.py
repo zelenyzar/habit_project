@@ -1,8 +1,7 @@
-from django.db import models
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.conf import settings
-
+from django.db import models
 
 User = get_user_model()
 
@@ -11,9 +10,7 @@ class Habit(models.Model):
     """Модель «Привычка»."""
 
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
-        related_name='habits'
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="habits"
     )
 
     place = models.CharField(
@@ -28,7 +25,6 @@ class Habit(models.Model):
     action = models.CharField(
         "Действие",
         max_length=500,
-        # Формат: «я буду [ДЕЙСТВИЕ] в [ВРЕМЯ] в [МЕСТО]»
     )
 
     is_pleasant = models.BooleanField(
@@ -47,7 +43,7 @@ class Habit(models.Model):
 
     periodicity = models.PositiveSmallIntegerField(
         "Периодичность (в днях)",
-        default=1,  # 1 день = ежедневно
+        default=1,
     )
 
     reward = models.CharField(
@@ -91,13 +87,13 @@ class Habit(models.Model):
     def clean(self):
         super().clean()
 
-        # 2. Время ≤ 120 с = 2 мин
         if self.duration_minutes > 2:
             raise ValidationError(
-                {"duration_minutes": "Время выполнения не должно превышать 120 секунд (2 минуты)."}
+                {
+                    "duration_minutes": "Время выполнения не должно превышать 120 секунд (2 минуты)."
+                }
             )
 
-        # 4. Приятная привычка: без вознаграждения и без связанной привычки
         if self.is_pleasant:
             if self._strip_reward(self.reward):
                 raise ValidationError(
@@ -105,18 +101,19 @@ class Habit(models.Model):
                 )
             if self.related_habit is not None:
                 raise ValidationError(
-                    {"related_habit": "У приятной привычки не может быть связанной привычки."}
+                    {
+                        "related_habit": "У приятной привычки не может быть связанной привычки."
+                    }
                 )
 
-        # Для полезных привычек
         if not self.is_pleasant:
-            # 3. Связанная привычка должна быть приятной
             if self.related_habit is not None and not self.related_habit.is_pleasant:
                 raise ValidationError(
-                    {"related_habit": "В связанные привычки могут попадать только приятные привычки."}
+                    {
+                        "related_habit": "В связанные привычки могут попадать только приятные привычки."
+                    }
                 )
 
-            # 1. XOR: не одновременно related_habit и reward
             if self.related_habit is not None and self._strip_reward(self.reward):
                 raise ValidationError(
                     {
