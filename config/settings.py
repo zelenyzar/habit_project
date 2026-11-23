@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "django_filters",
@@ -36,6 +37,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -105,7 +107,6 @@ LANGUAGE_CODE = "en-us"
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
-USE_L18N = True
 
 USE_TZ = True
 
@@ -130,7 +131,7 @@ MEDIA_URL = "/media/"
 # место, где будут храниться файлы
 MEDIA_ROOT = BASE_DIR / "media"
 
-AUTH_USER_MODEL = "users.User"
+AUTH_USER_MODEL = "user.User"
 
 REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": [
@@ -142,6 +143,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 5,
 }
 
 SIMPLE_JWT = {
@@ -209,3 +212,23 @@ LOGGING = {
         },
     },
 }
+
+TELEGRAM_BOT_TOKEN = os.getenv("TG_TOKEN")
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "check-habits-every-5-minutes": {
+        "task": "habit.tasks.send_habit_reminders",
+        "schedule": 300.0,  # секунды
+    },
+}
+
+# CORS — доступ фронтенда к API
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:3000",
+]

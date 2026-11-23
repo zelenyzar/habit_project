@@ -1,0 +1,110 @@
+[
+{
+  "model": "user.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$3cPtzKUFTRZU7MJGVg0KJX$F5Mh+5rG2ZRDK93LBIqTBYpA0J6mkOFaAlkLnAU+g1Y=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin@example.com",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2026-11-22T22:50:07.326Z",
+    "email": "admin@example.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$asNv7pFf9uYysDRPtObkhT$Eg50gLJodhBkVLOczKWaonFH3PWu7o2KT0t41Diw1UU=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "anna",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-11-22T22:59:21.290Z",
+    "email": "anna@example.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "user.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1200000$j0sNlAfoff9dYM5dcgtCQb$SFa1a28hAY+JxaDHhGs3utfzyVqr9j2urjjq5MDu97M=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "boris",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2026-11-22T22:59:21.672Z",
+    "email": "boris@example.com",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "habit.habit",
+  "pk": 1,
+  "fields": {
+    "user": 2,
+    "place": "Дом",
+    "time": "07:30:00",
+    "action": "Выпить стакан воды",
+    "is_pleasant": true,
+    "related_habit": null,
+    "periodicity": 1,
+    "reward": "",
+    "duration_minutes": 1,
+    "is_public": true,
+    "created_at": "2026-11-22T22:59:22.077Z",
+    "updated_at": "2026-11-22T22:59:22.077Z"
+  }
+},
+{
+  "model": "habit.habit",
+  "pk": 2,
+  "fields": {
+    "user": 2,
+    "place": "Парк",
+    "time": "07:00:00",
+    "action": "Утренняя пробежка 30 минут",
+    "is_pleasant": false,
+    "related_habit": 1,
+    "periodicity": 1,
+    "reward": "",
+    "duration_minutes": 2,
+    "is_public": false,
+    "created_at": "2026-11-22T22:59:22.088Z",
+    "updated_at": "2026-11-22T22:59:22.088Z"
+  }
+},
+{
+  "model": "habit.habit",
+  "pk": 3,
+  "fields": {
+    "user": 3,
+    "place": "Спортзал",
+    "time": "19:00:00",
+    "action": "Силовая тренировка",
+    "is_pleasant": false,
+    "related_habit": null,
+    "periodicity": 2,
+    "reward": "Молочный коктейль",
+    "duration_minutes": 2,
+    "is_public": false,
+    "created_at": "2026-11-22T22:59:22.089Z",
+    "updated_at": "2026-11-22T22:59:22.089Z"
+  }
+}
+]
