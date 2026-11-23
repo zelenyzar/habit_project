@@ -38,72 +38,36 @@ class HabitSerializer(serializers.ModelSerializer):
         return value.strip() if isinstance(value, str) else ""
 
     def validate(self, attrs):
-        instance = self.instance
+        reward = attrs.get("reward", getattr(self.instance, "reward", None) if self.instance else None)
+        related = attrs.get("related_habit", getattr(self.instance, "related_habit", None) if self.instance else None)
+        is_pleasant = attrs.get("is_pleasant", getattr(self.instance, "is_pleasant", False) if self.instance else False)
 
-        is_pleasant = attrs.get(
-            "is_pleasant",
-            instance.is_pleasant if instance else False,
-        )
-        related = attrs.get(
-            "related_habit",
-            instance.related_habit if instance else None,
-        )
-        # ВАЖНО: если поле не передано, берём текущее значение из instance
-        reward = attrs.get(
-            "reward",
-            instance.reward if instance else "",
-        ) or ""
-        reward_str = self._strip_reward(reward)
-        duration = attrs.get(
-            "duration_minutes",
-            instance.duration_minutes if instance else 0,
-        )
-        periodicity = attrs.get(
-            "periodicity",
-            instance.periodicity if instance else 1,
-        )
-
-        # 4. Приятная: нет reward, нет related_habit
-        if is_pleasant:
-            if reward_str:
-                raise serializers.ValidationError(
-                    {"reward": "У приятной привычки не может быть вознаграждения."}
-                )
-            if related is not None:
-                raise serializers.ValidationError(
-                    {"related_habit": "У приятной привычки не может быть связанной привычки."}
-                )
-
-        # Полезные привычки
-        if not is_pleasant:
-            # 1. XOR: related_habit и reward — не одновременно
-            if related is not None and reward_str:
-                raise serializers.ValidationError(
-                    {
-                        "related_habit": "Нельзя указывать и связанную привычку, и вознаграждение одновременно. Выберите что-то одно.",
-                        "reward": "Нельзя указывать и связанную привычку, и вознаграждение одновременно. Выберите что-то одно.",
-                    }
-                )
-
-            # 3. Связанная должна быть приятной
-            if related is not None and not related.is_pleasant:
-                raise serializers.ValidationError(
-                    {"related_habit": "В связанные привычки могут попадать только приятные привычки."}
-                )
-
-        # 5, 6. Периодичность: 1–7 дней (7 = «раз в неделю», допустимо; 14 — нет)
-        if not (1 <= periodicity <= 7):
+        if reward and related:
             raise serializers.ValidationError(
-                {
-                    "periodicity": "Периодичность должна быть от 1 до 7 дней "
-                    "(нельзя выполнять реже 1 раза в 7 дней)."
-                }
+                "Нельзя одновременно указывать и награду, и связанную привычку."
             )
 
-        # 2. Длительность ≤ 2 мин (120 с)
-        if duration > 2:
+        if related and not related.is_pleasant:
             raise serializers.ValidationError(
-                {"duration_minutes": "Время выполнения не должно превышать 120 секунд (2 минуты)."}
+                "В связанную привычку можно поставить только приятную."
+            )
+
+        if is_pleasant and (reward or related):
+            raise serializers.ValidationError(
+                "У приятной привычки не может быть награды или связанной привычки."
             )
 
         return attrs
+    def validate_periodicity(self, value):
+        if value < 1 or value > 7:
+            raise serializers.ValidationError(
+                "Периодичность должна быть от 1 до 7 дней."
+            )
+        return value
+
+    def validate_duration_minutes(self, value):
+        if value < 1 or value > 2:
+            raise serializers.ValidationError(
+                "Время выполнения не может быть больше 2 минут."
+            )
+        return value

@@ -13,7 +13,9 @@ dependencies = [
     "djangorestframework-simplejwt (>=5.5.1,<6.0.0)",
     "djangorestframework-stubs (>=3.18.2,<4.0.0)",
     "requests (>=2.34.2,<3.0.0)",
-    "celery (>=5.7.0,<6.0.0)"
+    "celery (>=5.7.0,<6.0.0)",
+    "drf-yasg (>=1.21.18,<2.0.0)",
+    "requests-mock (>=1.12.1,<2.0.0)"
 ]
 
 
